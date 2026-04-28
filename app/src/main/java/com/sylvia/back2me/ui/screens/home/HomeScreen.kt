@@ -26,6 +26,7 @@ import androidx.navigation.NavController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.rememberNavController
 import com.sylvia.back2me.navigation.ROUTE_ADD_ITEM
+import com.sylvia.back2me.navigation.ROUTE_ITEM_DETAIL
 import com.sylvia.back2me.navigation.ROUTE_VIEW_ITEM
 import com.sylvia.back2me.navigation.ROUT_HOME
 import com.sylvia.back2me.ui.theme.newBlue
@@ -100,7 +101,7 @@ fun HomeScreen(navController: NavController){
                     selected = selectedIndex == 2,
                     onClick = {
                         selectedIndex = 2
-                        navController.navigate(ROUTE_VIEW_ITEM)
+                        navController.navigate(ROUTE_ITEM_DETAIL)
                     }
                 )
             }
