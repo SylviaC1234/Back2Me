@@ -1,19 +1,23 @@
 package com.sylvia.back2me.ui.screens.details
 
+import android.content.Intent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 
@@ -21,16 +25,18 @@ import androidx.navigation.compose.rememberNavController
 @Composable
 fun ItemDetailScreen(navController: NavController) {
 
+    val context = LocalContext.current
+
+    // 🔥 dialog state
+    var showContactDialog by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Item Details") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = "Back"
-                        )
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
                     }
                 }
             )
@@ -45,7 +51,7 @@ fun ItemDetailScreen(navController: NavController) {
             horizontalAlignment = Alignment.Start
         ) {
 
-            // 🔹 IMAGE (safe version for now)
+            // 🔹 IMAGE
             Image(
                 painter = painterResource(id = android.R.drawable.ic_menu_gallery),
                 contentDescription = "Item Image",
@@ -92,25 +98,75 @@ fun ItemDetailScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(6.dp))
 
             Text(
-                text = "Black backpack with a laptop inside. Lost near the school gate during break time.",
-                style = MaterialTheme.typography.bodyMedium
+                text = "Black backpack with a laptop inside. Lost near the school gate during break time."
             )
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 🔹 ACTION BUTTON
+            // 🔹 CONTACT BUTTON
             Button(
-                onClick = { /* TODO: contact owner */ },
+                onClick = { showContactDialog = true },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Contact Owner")
             }
         }
     }
+
+    // 🔥 CONTACT DIALOG
+    if (showContactDialog) {
+
+        AlertDialog(
+            onDismissRequest = { showContactDialog = false },
+            title = { Text("Contact Owner") },
+            text = { Text("Choose how you want to contact the owner") },
+
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showContactDialog = false
+
+                        val callIntent = Intent(Intent.ACTION_DIAL).apply {
+                            data = "tel:0717085866".toUri()
+                        }
+                        context.startActivity(callIntent)
+                    }
+                ) {
+                    Text("Call")
+                }
+            },
+
+            dismissButton = {
+                Row {
+
+                    TextButton(
+                        onClick = {
+                            showContactDialog = false
+
+                            val smsIntent = Intent(Intent.ACTION_SENDTO).apply {
+                                data = "smsto:0717085866".toUri()
+                            }
+                            context.startActivity(smsIntent)
+                        }
+                    ) {
+                        Text("Message")
+                    }
+
+                    TextButton(
+                        onClick = {
+                            showContactDialog = false
+                        }
+                    ) {
+                        Text("Cancel")
+                    }
+                }
+            }
+        )
+    }
 }
 
+@Preview(showBackground = true)
 @Composable
-@androidx.compose.ui.tooling.preview.Preview(showBackground = true)
 fun ItemDetailScreenPreview() {
     ItemDetailScreen(rememberNavController())
 }

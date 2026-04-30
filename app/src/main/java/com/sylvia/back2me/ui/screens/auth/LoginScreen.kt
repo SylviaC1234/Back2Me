@@ -27,6 +27,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.sylvia.back2me.R
 import com.sylvia.back2me.data.AuthViewModel
+import com.sylvia.back2me.navigation.ROUTE_REGISTER
 import com.sylvia.back2me.navigation.ROUT_HOME
 import com.sylvia.back2me.ui.theme.newBlue
 
@@ -118,7 +119,7 @@ fun LoginScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        TextButton(onClick = { }) {
+        TextButton(onClick = {navController.navigate(ROUTE_REGISTER) }) {
             Text(
                 text = "Don't have an account? Register",
                 fontSize = 15.sp,
