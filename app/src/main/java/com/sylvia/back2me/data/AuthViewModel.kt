@@ -11,29 +11,40 @@ import com.sylvia.back2me.navigation.ROUT_HOME
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sylvia.back2me.navigation.ROUTE_ADD_ITEM
+import com.sylvia.back2me.navigation.ROUTE_LOGIN
 import com.sylvia.back2me.navigation.ROUTE_REGISTER
 
 
 class AuthViewModel(var navController: NavController, var context: Context){
     private val mAuth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    fun signup(username:String, email:String, password:String, confirmpassword:String){
+    fun signup(username: String, email: String, password: String, confirmpassword: String) {
 
-        if (email.isBlank() || password.isBlank() || confirmpassword.isBlank() || username.isBlank()) {
-            Toast.makeText(context,"Please email and password cannot be blank", Toast.LENGTH_LONG).show()
-        } else if (password != confirmpassword) {
-            Toast.makeText(context,"Password do not match", Toast.LENGTH_LONG).show()
-        } else {
+        if (username.isBlank() || email.isBlank() || password.isBlank() || confirmpassword.isBlank()) {
+            Toast.makeText(context, "All fields are required", Toast.LENGTH_LONG).show()
+            return
+        }
 
-            mAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener {
-                if (it.isSuccessful){
+        if (password != confirmpassword) {
+            Toast.makeText(context, "Passwords do not match", Toast.LENGTH_LONG).show()
+            return
+        }
 
-                    val uid = mAuth.currentUser!!.uid
+        mAuth.createUserWithEmailAndPassword(email, password)
+            .addOnCompleteListener { task ->
 
-                    // DEFAULT role = "user"
+                if (task.isSuccessful) {
+
+                    val uid = mAuth.currentUser?.uid
+
+                    if (uid == null) {
+                        Toast.makeText(context, "User ID error", Toast.LENGTH_LONG).show()
+                        return@addOnCompleteListener
+                    }
+
                     val role = "user"
 
-                    val userdata = User(  //Info is fetched from the model User
+                    val userdata = User(
                         username = username,
                         email = email,
                         password = password,
@@ -41,27 +52,45 @@ class AuthViewModel(var navController: NavController, var context: Context){
                         role = role
                     )
 
-                    val regRef = FirebaseDatabase.getInstance().getReference("Users/$uid") //it refers to the backend model where the info goes-Users
+                    val regRef = FirebaseDatabase.getInstance()
+                        .getReference("Users/$uid")
 
-                    regRef.setValue(userdata).addOnCompleteListener { result ->
+                    regRef.setValue(userdata)
+                        .addOnCompleteListener { dbTask ->
 
-                        if (result.isSuccessful){
-                            Toast.makeText(context, "Registered Successfully", Toast.LENGTH_LONG).show()
-                        } else {
-                            Toast.makeText(context, "${result.exception!!.message}", Toast.LENGTH_LONG).show()
-                            navController.navigate(ROUTE_REGISTER)
+                            if (dbTask.isSuccessful) {
+
+                                Toast.makeText(
+                                    context,
+                                    "Registered Successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                // ✅ Navigate to login after success
+                                navController.navigate(ROUTE_LOGIN) {
+                                    popUpTo(0)
+                                }
+
+                            } else {
+
+                                Toast.makeText(
+                                    context,
+                                    dbTask.exception?.message ?: "Database error",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
                         }
 
-                    }
-
                 } else {
-                    navController.navigate(ROUTE_REGISTER)
+
+                    Toast.makeText(
+                        context,
+                        task.exception?.message ?: "Signup failed",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
             }
-        }
     }
-
-
 
     fun login(email: String, password: String) {
 
