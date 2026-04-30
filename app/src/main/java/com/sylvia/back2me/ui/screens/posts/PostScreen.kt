@@ -14,6 +14,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.sylvia.back2me.navigation.ROUTE_ADD_ITEM
+import com.sylvia.back2me.navigation.ROUTE_PROFILE
 import com.sylvia.back2me.navigation.ROUT_HOME
 
 // 🔥 SIMPLE MODEL (keep for now if you don't already have one)
@@ -111,7 +113,7 @@ fun PostScreen(navController: NavController) {
                     selected = selectedIndex == 2,
                     onClick = {
                         selectedIndex = 2
-                        navController.navigate(ROUT_HOME) {
+                        navController.navigate(ROUTE_PROFILE) {
                             popUpTo(ROUT_HOME)
                             launchSingleTop = true
                         }
@@ -123,7 +125,7 @@ fun PostScreen(navController: NavController) {
         // 🔵 FLOATING BUTTON
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {},
+                onClick = { navController.navigate(ROUTE_ADD_ITEM)},
                 containerColor = newBlue
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")

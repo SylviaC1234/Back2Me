@@ -9,9 +9,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.sylvia.back2me.ui.screens.add.AddItemScreen
+import com.sylvia.back2me.ui.screens.auth.LoginScreen
+import com.sylvia.back2me.ui.screens.auth.RegisterScreen
 import com.sylvia.back2me.ui.screens.details.ItemDetailScreen
 import com.sylvia.back2me.ui.screens.home.HomeScreen
 import com.sylvia.back2me.ui.screens.posts.PostScreen
+import com.sylvia.back2me.ui.screens.profile.ProfileScreen
 import com.sylvia.sokohub.ui.screens.splash.SplashScreen
 
 
@@ -45,6 +48,18 @@ fun AppNavHost(
 
         composable(ROUTE_POST) {
             PostScreen(navController)
+        }
+
+        composable(ROUTE_LOGIN) {
+            LoginScreen(navController)
+        }
+
+        composable(ROUTE_REGISTER) {
+            RegisterScreen(navController)
+        }
+
+        composable(ROUTE_PROFILE) {
+            ProfileScreen(navController)
         }
 
 

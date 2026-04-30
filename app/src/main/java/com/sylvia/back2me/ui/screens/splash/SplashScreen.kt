@@ -17,7 +17,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.sylvia.back2me.navigation.ROUT_HOME
+import com.sylvia.back2me.navigation.ROUTE_REGISTER
 import com.sylvia.back2me.ui.theme.newBlue
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -31,7 +31,7 @@ fun SplashScreen(navController: NavController){
     val coroutinescope = rememberCoroutineScope ()
     coroutinescope.launch {
         delay(3000)
-        navController.navigate(ROUT_HOME)
+        navController.navigate(ROUTE_REGISTER)
 
 
 

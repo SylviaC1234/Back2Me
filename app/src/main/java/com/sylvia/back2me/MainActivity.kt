@@ -1,4 +1,4 @@
-package com.sylvia.sokohub
+package com.sylvia.back2me
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
