@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ItemDetailScreen(navController: NavController) {
+fun ItemDetailScreen(navController: NavController, itemId: String?) {
 
     val context = LocalContext.current
 
@@ -168,5 +168,8 @@ fun ItemDetailScreen(navController: NavController) {
 @Preview(showBackground = true)
 @Composable
 fun ItemDetailScreenPreview() {
-    ItemDetailScreen(rememberNavController())
+    ItemDetailScreen(
+        navController = rememberNavController(),
+        itemId = "sample_id"
+    )
 }

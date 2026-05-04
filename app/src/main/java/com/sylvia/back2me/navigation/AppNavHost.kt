@@ -39,9 +39,6 @@ fun AppNavHost(
             AddItemScreen(navController) }
 
 
-        composable(ROUTE_ITEM_DETAIL) {
-            ItemDetailScreen(navController) }
-
         composable(ROUTE_SPLASH) {
             SplashScreen(navController) }
 
@@ -60,6 +57,11 @@ fun AppNavHost(
 
         composable(ROUTE_PROFILE) {
             ProfileScreen(navController)
+        }
+
+        composable("$ROUTE_ITEM_DETAILS/{itemId}") { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId")
+            ItemDetailScreen(navController, itemId)
         }
 
 
