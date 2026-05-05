@@ -1,6 +1,6 @@
 package com.sylvia.back2me.navigation
 
-const val ROUT_HOME = "home"
+const val ROUTE_HOME = "home"
 const val ROUTE_ADD_ITEM = "additem"
 
 const val ROUTE_SPLASH = "splash"

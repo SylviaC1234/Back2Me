@@ -7,7 +7,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavController
 import com.sylvia.back2me.models.User
-import com.sylvia.back2me.navigation.ROUT_HOME
+import com.sylvia.back2me.navigation.ROUTE_HOME
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sylvia.back2me.navigation.ROUTE_ADD_ITEM
@@ -118,12 +118,12 @@ class AuthViewModel(var navController: NavController, var context: Context){
 
 
                         else {
-                            navController.navigate(ROUT_HOME)
+                            navController.navigate(ROUTE_HOME)
                         }
 
                     }.addOnFailureListener {
                         Toast.makeText(context, "Failed to fetch user role", Toast.LENGTH_SHORT).show()
-                        navController.navigate(ROUT_HOME)
+                        navController.navigate(ROUTE_HOME)
                     }
 
                 } else {
@@ -137,7 +137,7 @@ class AuthViewModel(var navController: NavController, var context: Context){
 
     fun logout(){
         mAuth.signOut()
-        navController.navigate(ROUT_HOME)
+        navController.navigate(ROUTE_HOME)
     }
 
 

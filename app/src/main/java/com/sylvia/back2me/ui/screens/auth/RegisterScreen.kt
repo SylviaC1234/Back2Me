@@ -65,7 +65,7 @@ fun RegisterScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Join us and start your journey today!",
+            text = "Let's find your lost item!",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )

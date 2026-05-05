@@ -3,11 +3,15 @@ package com.sylvia.back2me.navigation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
+import com.sylvia.back2me.data.LostItemViewModel
 import com.sylvia.back2me.ui.screens.add.AddItemScreen
 import com.sylvia.back2me.ui.screens.auth.LoginScreen
 import com.sylvia.back2me.ui.screens.auth.RegisterScreen
@@ -25,23 +29,36 @@ fun AppNavHost(
     navController: NavHostController = rememberNavController(),
     startDestination: String = ROUTE_SPLASH
 ) {
+    // 1. Create the shared ViewModel at the top level
+    val itemViewModel: LostItemViewModel = viewModel()
 
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-        composable(ROUT_HOME) {
-            HomeScreen(navController)
+        // 2. Updated Home Route to use the shared ViewModel
+        composable(ROUTE_HOME) {
+            HomeScreen(navController, itemViewModel)
         }
 
-        composable(ROUTE_ADD_ITEM) {
-            AddItemScreen(navController) }
+        // 3. Added the Detail Route with the ID argument
+        composable(
+            route = "$ROUTE_ITEM_DETAILS/{itemId}",
+            arguments = listOf(navArgument("itemId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val itemId = backStackEntry.arguments?.getString("itemId")
+            ItemDetailScreen(navController, itemId, itemViewModel)
+        }
 
+        // --- The rest of your routes remain exactly as they were ---
+        composable(ROUTE_ADD_ITEM) {
+            AddItemScreen(navController)
+        }
 
         composable(ROUTE_SPLASH) {
-            SplashScreen(navController) }
-
+            SplashScreen(navController)
+        }
 
         composable(ROUTE_POST) {
             PostScreen(navController)
@@ -58,19 +75,5 @@ fun AppNavHost(
         composable(ROUTE_PROFILE) {
             ProfileScreen(navController)
         }
-
-        composable("$ROUTE_ITEM_DETAILS/{itemId}") { backStackEntry ->
-            val itemId = backStackEntry.arguments?.getString("itemId")
-            ItemDetailScreen(navController, itemId)
-        }
-
-
-
-
-
-
-
-
-
     }
 }

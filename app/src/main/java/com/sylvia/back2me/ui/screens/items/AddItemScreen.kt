@@ -22,10 +22,12 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
+import com.google.firebase.auth.FirebaseAuth
 import com.sylvia.back2me.data.LostItemViewModel
 import com.sylvia.back2me.models.LostItem
-import com.sylvia.back2me.navigation.ROUT_HOME
+import com.sylvia.back2me.navigation.ROUTE_HOME
 import com.sylvia.back2me.ui.theme.newBlue
+
 
 @SuppressLint("UnrememberedGetBackStackEntry")
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +38,7 @@ fun AddItemScreen(navController: NavController) {
 
     // ✅ SHARED VIEWMODEL: Same scoping as HomeScreen
     val viewModel: LostItemViewModel = if (!isPreview) {
-        val backStackEntry = remember(navController) { navController.getBackStackEntry(ROUT_HOME) }
+        val backStackEntry = remember(navController) { navController.getBackStackEntry(ROUTE_HOME) }
         viewModel(backStackEntry)
     } else {
         viewModel()
@@ -102,20 +104,31 @@ fun AddItemScreen(navController: NavController) {
 
                         val newItem = LostItem(
                             id = System.currentTimeMillis().toString(),
-                            title = title, type = type, location = location,
-                            description = description, contact = contact,
+                            title = title,
+                            type = type,
+                            location = location,
+                            description = description,
+                            contact = contact,
                             imageUrl = imageUri?.toString() ?: ""
                         )
 
-                        // ✅ IMMEDIATE UPDATE
                         viewModel.addItem(newItem)
 
-                        // ✅ BACKEND UPLOAD
-                        viewModel.uploadItem(imageUri, title, type, location, description, contact, context) {
+                        viewModel.uploadItem(
+                            imageUri,
+                            title,
+                            type,
+                            location,
+                            description,
+                            contact,
+                            FirebaseAuth.getInstance().currentUser?.uid ?: "",
+                            context
+                        ) {
                             isUploading = false
                             navController.popBackStack()
                         }
                     },
+
                     modifier = Modifier.fillMaxWidth().height(50.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = newBlue)
                 ) { Text("Post Item", color = Color.White) }

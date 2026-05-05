@@ -57,18 +57,15 @@ class LostItemViewModel : ViewModel() {
         location: String,
         description: String,
         contact: String,
+        userId: String, // <--- Pass the current user's ID here
         context: Context,
         onSuccess: () -> Unit
     ) {
         Thread {
-
             try {
-
                 val imageUrl = imageUri?.let { uploadToCloudinary(context, it) }
 
-                val ref = FirebaseDatabase.getInstance()
-                    .getReference("Items")
-                    .push()
+                val ref = FirebaseDatabase.getInstance().getReference("Items").push()
 
                 val item = LostItem(
                     id = ref.key,
@@ -78,30 +75,24 @@ class LostItemViewModel : ViewModel() {
                     description = description,
                     imageUrl = imageUrl,
                     contact = contact,
-
-
+                    userId = userId // <--- Save it to the database
                 )
 
-                ref.setValue(item)
-
-                (context as android.app.Activity).runOnUiThread {
-                    Toast.makeText(context, "Item posted successfully", Toast.LENGTH_LONG).show()
-                    onSuccess()
+                ref.setValue(item).addOnSuccessListener {
+                    (context as android.app.Activity).runOnUiThread {
+                        Toast.makeText(context, "Item posted successfully", Toast.LENGTH_LONG).show()
+                        onSuccess()
+                    }
                 }
 
             } catch (e: Exception) {
-
                 (context as android.app.Activity).runOnUiThread {
-                    Toast.makeText(
-                        context,
-                        "Upload failed: ${e.message}",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Toast.makeText(context, "Upload failed: ${e.message}", Toast.LENGTH_LONG).show()
                 }
             }
-
         }.start()
     }
+
 
     // ✅ SAFE CLOUDINARY UPLOAD
     private fun uploadToCloudinary(context: Context, uri: Uri): String {
@@ -137,6 +128,8 @@ class LostItemViewModel : ViewModel() {
 
     fun addItem(newItem: LostItem) {
         _items.add(0, newItem)
+
+
     }
 
     fun deleteItem(context: android.content.Context, id: String) {
@@ -150,4 +143,5 @@ class LostItemViewModel : ViewModel() {
             }
         }
     }
+
 }

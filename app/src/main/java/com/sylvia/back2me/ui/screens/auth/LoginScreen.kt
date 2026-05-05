@@ -28,7 +28,7 @@ import androidx.navigation.compose.rememberNavController
 import com.sylvia.back2me.R
 import com.sylvia.back2me.data.AuthViewModel
 import com.sylvia.back2me.navigation.ROUTE_REGISTER
-import com.sylvia.back2me.navigation.ROUT_HOME
+import com.sylvia.back2me.navigation.ROUTE_HOME
 import com.sylvia.back2me.ui.theme.newBlue
 
 @Composable
@@ -63,7 +63,7 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Welcome back!!",
+            text = "Welcome!!",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
         )
@@ -130,7 +130,7 @@ fun LoginScreen(navController: NavController) {
         TextButton(
             onClick = {
                 if (!isPreview) {
-                    navController.navigate(ROUT_HOME)
+                    navController.navigate(ROUTE_HOME)
                 }
             }
         ) {
