@@ -43,29 +43,56 @@ fun ProfileScreen(navController: NavController) {
     val auth = if (!isPreview) FirebaseAuth.getInstance() else null
     val currentUser = auth?.currentUser
 
-    var username by remember { mutableStateOf(if (isPreview) "Preview User" else "Loading...") }
+    var username by remember {
+        mutableStateOf(if (isPreview) "Preview User" else "Loading...")
+    }
+
     val email = currentUser?.email ?: "No Email Found"
 
-    var imageUri by remember { mutableStateOf<Uri?>(currentUser?.photoUrl) }
-
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     var showLogoutDialog by remember { mutableStateOf(false) }
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
+
         uri?.let {
+
             imageUri = it
 
-            val profileUpdates = userProfileChangeRequest {
-                photoUri = it
-            }
+            com.sylvia.back2me.data.CloudinaryManager.uploadImage(
+                context = context,
+                imageUri = it,
+                onSuccess = { imageUrl ->
 
-            currentUser?.updateProfile(profileUpdates)
+                    val profileUpdates = userProfileChangeRequest {
+                        photoUri = Uri.parse(imageUrl)
+                    }
+
+                    currentUser?.updateProfile(profileUpdates)
+
+                    currentUser?.uid?.let { uid ->
+                        FirebaseDatabase.getInstance()
+                            .getReference("Users/$uid/profileImage")
+                            .setValue(imageUrl)
+                    }
+
+                    imageUri = Uri.parse(imageUrl)
+                },
+                onError = { error ->
+                    android.widget.Toast.makeText(
+                        context,
+                        error,
+                        android.widget.Toast.LENGTH_SHORT
+                    ).show()
+                }
+            )
         }
     }
 
     LaunchedEffect(currentUser) {
         if (!isPreview && currentUser != null) {
+
             val userRef = FirebaseDatabase.getInstance()
                 .getReference("Users/${currentUser.uid}/username")
 
@@ -74,12 +101,30 @@ fun ProfileScreen(navController: NavController) {
                     ?: currentUser.displayName
                             ?: "User"
             }
+
+            val imgRef = FirebaseDatabase.getInstance()
+                .getReference("Users/${currentUser.uid}/profileImage")
+
+            imgRef.get().addOnSuccessListener {
+                val url = it.value?.toString()
+                if (url != null) {
+                    imageUri = Uri.parse(url)
+                } else {
+                    currentUser.photoUrl?.let { uri ->
+                        imageUri = uri
+                    }
+                }
+            }
         }
     }
 
     val itemViewModel: LostItemViewModel = viewModel()
-    val allItems = itemViewModel.items
 
+    // ✅ FIX: make items reactive
+    val allItems = itemViewModel.items
+    LaunchedEffect(Unit) {
+        itemViewModel.fetchItems(context)
+    }
     val userPostsCount by remember(allItems, currentUser) {
         derivedStateOf {
             if (isPreview) {
@@ -119,9 +164,7 @@ fun ProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(20.dp))
 
             Box(
-                modifier = Modifier
-                    .size(130.dp)
-                    .clickable { launcher.launch("image/*") },
+                modifier = Modifier.size(130.dp),
                 contentAlignment = Alignment.BottomEnd
             ) {
 
@@ -129,7 +172,8 @@ fun ProfileScreen(navController: NavController) {
                     modifier = Modifier
                         .fillMaxSize()
                         .clip(CircleShape)
-                        .background(newBlue.copy(alpha = 0.1f)),
+                        .background(newBlue.copy(alpha = 0.1f))
+                        .clickable { launcher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     if (imageUri != null) {
@@ -149,7 +193,21 @@ fun ProfileScreen(navController: NavController) {
                     }
                 }
 
-
+                Box(
+                    modifier = Modifier
+                        .size(36.dp)
+                        .clip(CircleShape)
+                        .background(newBlue)
+                        .clickable { launcher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Edit,
+                        contentDescription = "Edit Profile Picture",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(20.dp))
